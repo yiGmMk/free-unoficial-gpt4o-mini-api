@@ -6,6 +6,10 @@ app = FastAPI()
 
 @app.get("/chat/")
 async def chat(query: str):
-    results = DDGS().chat(query, model='gpt-4o-mini')
-    return JSONResponse(content={"results": results})
+    results = None
+    try:
+        results = DDGS().chat(query, model='gpt-4o-mini')
+        return JSONResponse(content={"results": results})
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
 
