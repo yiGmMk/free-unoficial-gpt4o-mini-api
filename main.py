@@ -11,8 +11,12 @@ async def chat(query: str):
         results = DDGS().chat(query, model='gpt-4o-mini')
         return JSONResponse(content={"results": results})
     except Exception as e:
-        return JSONResponse(content={"error": str(e)})
+        try:
+            results = DDGS().chat(query, model='claude-3-haiku')
+            return JSONResponse(content={"results": results})
+        except Exception as e:
+            return JSONResponse(content={"error": str(e)})
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=3211, log_level="info")
