@@ -16,7 +16,7 @@ app.add_middleware(
 
 
 @app.get("/chat/")
-async def chat(query: str):
+async def chat(query: str) -> JSONResponse:
     results = None
     try:
         results = DDGS().chat(query, model='gpt-4o-mini')
