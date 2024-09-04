@@ -14,17 +14,22 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
+def chat_with_model(query: str, model: str) -> JSONResponse:
+    results = None
+    try:
+        results = DDGS().chat(query, model=model)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+    return JSONResponse(content={"results": results})
 
 @app.get("/chat/")
 async def chat(query: str) -> JSONResponse:
     results = None
     try:
-        results = DDGS().chat(query, model='gpt-4o-mini')
-        return JSONResponse(content={"results": results})
+        return chat_with_model(query, model='gpt-4o-mini')
     except Exception as e:
         try:
-            results = DDGS().chat(query, model='claude-3-haiku')
-            return JSONResponse(content={"results": results})
+            return chat_with_model(query, model='claude-3-haiku')
         except Exception as e:
             return JSONResponse(content={"error": str(e)})
 
