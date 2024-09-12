@@ -24,7 +24,6 @@ def chat_with_model(query: str, model: str) -> JSONResponse:
 
 @app.get("/chat/")
 async def chat(query: str) -> JSONResponse:
-    results = None
     try:
         return chat_with_model(query, model='gpt-4o-mini')
     except Exception as e:
