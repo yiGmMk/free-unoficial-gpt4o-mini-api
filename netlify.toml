@@ -1,5 +1,5 @@
 [build]
-command = "pip install -r requirements.txt && uvicorn functions.api.main:app --host 0.0.0.0 --port 8888"
+command = "pip install -r requirements.txt"
 functions = "api"
 
 [functions]
