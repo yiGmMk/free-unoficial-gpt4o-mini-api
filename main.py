@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from duckduckgo_search import DDGS
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional,List
 
 app = FastAPI()
 origins = ["*"] 
@@ -29,6 +31,30 @@ async def chat(query: str) -> JSONResponse:
     except Exception as e:
         try:
             return chat_with_model(query, model='claude-3-haiku')
+        except Exception as e:
+            return JSONResponse(content={"error": str(e)})
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatCompletionRequest(BaseModel):
+    model: str = "gpt-4o-mini"
+    messages: List[ChatMessage]
+    max_tokens: Optional[int] = 512
+    temperature: Optional[float] = 0.1
+    stream: Optional[bool] = False
+
+@app.post("/v1/chat/completions")
+async def chat_completions(request: ChatCompletionRequest):
+    if len(request.messages) == 0:
+        return JSONResponse(content={"error": "No messages provided"}, status_code=400)
+    msg=str.join(request.messages,",")
+    try:
+        return chat_with_model(msg, model=request.model)
+    except Exception as e:
+        try:
+            return chat_with_model(msg, model='claude-3-haiku')
         except Exception as e:
             return JSONResponse(content={"error": str(e)})
 

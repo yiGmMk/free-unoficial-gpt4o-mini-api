@@ -12,3 +12,9 @@
 
 netlify doesn't spport python so we used vercel
 
+
+## ref
+
+- [tool,DDGS](https://github.com/0xZee/NewsLetter-CrewAi-Agents-streamlit)
+- vercel
+
