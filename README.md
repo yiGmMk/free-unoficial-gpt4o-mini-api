@@ -8,3 +8,7 @@
 ### Setting up 
 - `python3.9 -m venv .venv`
 
+## deploy
+
+netlify doesn't spport python so we used vercel
+
