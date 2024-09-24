@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from duckduckgo_search import DDGS
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse,StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
@@ -58,6 +58,21 @@ def chat_with_model(query: str, model: str) -> JSONResponse:
     }
 
 
+# 流式响应 
+stream_response_headers = {
+    "Content-Type": "application/octet-stream",
+    "Cache-Control": "no-cache",
+}
+def chat_with_model_stream(query: str, model: str) -> StreamingResponse:
+    results = None
+    try:
+        results = DDGS().chat(query, model=model)
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+    def stream(msg:str):
+        yield msg
+    return StreamingResponse(stream(results), headers=stream_response_headers, media_type="text/event-stream")
+
 @app.get("/chat/")
 async def chat(query: str) -> JSONResponse:
     try:
@@ -93,9 +108,13 @@ async def chat_completions(request: ChatCompletionRequest):
 
     msg = request.get_joined_messages()
     try:
+        if request.stream:
+            return chat_with_model_stream(msg, model=request.model)
         return chat_with_model(msg, model=request.model)
     except Exception as e:
         try:
+            if request.stream:
+                return chat_with_model_stream(msg, model="claude-3-haiku")
             return chat_with_model(msg, model="claude-3-haiku")
         except Exception as e:
             return JSONResponse(content={"error": str(e)})
