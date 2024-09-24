@@ -105,7 +105,8 @@ class ChatCompletionRequest(BaseModel):
 async def chat_completions(request: ChatCompletionRequest):
     if len(request.messages) == 0:
         return JSONResponse(content={"error": "No messages provided"}, status_code=400)
-
+    if request.model not in ["gpt-4o-mini", "claude-3-haiku","llama-3-70b","mixtral-8x7b"]:
+        request.model="gpt-4o-mini"
     msg = request.get_joined_messages()
     try:
         if request.stream:
