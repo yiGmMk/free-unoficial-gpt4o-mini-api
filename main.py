@@ -91,7 +91,23 @@ async def chat(query: str) -> JSONResponse:
 @app.get("/search/")
 async def search(query: str) -> JSONResponse:
     try:
+        return JSONResponse(DDGS().text(keywords=query, region="zh-cn"))
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
+
+
+@app.get("/news/")
+async def search(query: str) -> JSONResponse:
+    try:
         return JSONResponse(DDGS().news(keywords=query, region="zh-cn"))
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
+
+
+@app.get("/suggestions/")
+async def search(query: str) -> JSONResponse:
+    try:
+        return JSONResponse(DDGS().suggestions(keywords=query, region="zh-cn"))
     except Exception as e:
         return JSONResponse(content={"error": str(e)})
 
