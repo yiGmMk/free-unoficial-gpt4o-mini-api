@@ -88,7 +88,7 @@ async def chat(query: str) -> JSONResponse:
             return JSONResponse(content={"error": str(e)})
 
 
-@app.get("/search/")
+@app.get("/search/", summary="文本搜索")
 async def search(query: str) -> JSONResponse:
     try:
         return JSONResponse(DDGS().text(keywords=query, region="zh-cn"))
@@ -96,7 +96,7 @@ async def search(query: str) -> JSONResponse:
         return JSONResponse(content={"error": str(e)})
 
 
-@app.get("/news/")
+@app.get("/news/", summary="新闻搜索")
 async def search(query: str) -> JSONResponse:
     try:
         return JSONResponse(DDGS().news(keywords=query, region="zh-cn"))
@@ -104,7 +104,7 @@ async def search(query: str) -> JSONResponse:
         return JSONResponse(content={"error": str(e)})
 
 
-@app.get("/suggestions/")
+@app.get("/suggestions/", summary="搜索建议")
 async def search(query: str) -> JSONResponse:
     try:
         return JSONResponse(DDGS().suggestions(keywords=query, region="zh-cn"))
