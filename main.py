@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from duckduckgo_search import DDGS
-from fastapi.responses import JSONResponse,StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
@@ -58,20 +58,24 @@ def chat_with_model(query: str, model: str) -> JSONResponse:
     }
 
 
-# 流式响应 
+# 流式响应
 stream_response_headers = {
     "Content-Type": "application/octet-stream",
     "Cache-Control": "no-cache",
 }
+
+
 def chat_with_model_stream(query: str, model: str) -> StreamingResponse:
     results = None
     try:
         results = DDGS().chat(query, model=model)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
-    def stream(msg:str):
+
+    def stream(msg: str):
         yield msg
     return StreamingResponse(stream(results), headers=stream_response_headers, media_type="text/event-stream")
+
 
 @app.get("/chat/")
 async def chat(query: str) -> JSONResponse:
@@ -82,6 +86,14 @@ async def chat(query: str) -> JSONResponse:
             return chat_with_model(query, model="claude-3-haiku")
         except Exception as e:
             return JSONResponse(content={"error": str(e)})
+
+
+@app.get("/search/")
+async def search(query: str) -> JSONResponse:
+    try:
+        return JSONResponse(DDGS().answers(keywords=query))
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)})
 
 
 class ChatMessage(BaseModel):
@@ -105,8 +117,8 @@ class ChatCompletionRequest(BaseModel):
 async def chat_completions(request: ChatCompletionRequest):
     if len(request.messages) == 0:
         return JSONResponse(content={"error": "No messages provided"}, status_code=400)
-    if request.model not in ["gpt-4o-mini", "claude-3-haiku","llama-3-70b","mixtral-8x7b"]:
-        request.model="gpt-4o-mini"
+    if request.model not in ["gpt-4o-mini", "claude-3-haiku", "llama-3-70b", "mixtral-8x7b"]:
+        request.model = "gpt-4o-mini"
     msg = request.get_joined_messages()
     try:
         if request.stream:
