@@ -44,18 +44,30 @@ def chat_with_model(query: str, model: str) -> JSONResponse:
         results = DDGS().chat(query, model=model)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
-    return {
+    
+    # 假设 results 是一个字符串，需要转换为 OpenAI 标准的 message 格式
+    message = {
+        "role": "assistant",
+        "content": results
+    }
+
+    return JSONResponse(content={
         "id": "chatcmpl-123",
         "object": "chat.completion",
         "created": int(time.time()),
         "choices": [
             {
                 "index": 0,
-                "message": results,
+                "message": message,
+                "finish_reason": "stop"
             }
         ],
-        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-    }
+        "usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": len(results.split()),
+            "total_tokens": len(results.split())
+        }
+    })
 
 
 # 流式响应
